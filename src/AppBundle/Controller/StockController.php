@@ -15,14 +15,14 @@ use Symfony\Component\HttpFoundation\Request;
 class StockController extends Controller
 {
     /**
-     * @Route("/stock-options", name="stock-options")
+     * @Route("/dashboard/stock-options", name="stock-options")
      */
     public function indexAction()
     {
         $stockOptions = $this->get('doctrine')->getRepository('AppBundle:StockOption')->findAll();
 
         return $this->render(
-            'home-broker/stock-options.html.twig',
+            'home-broker/stock-list.html.twig',
             [
                 'stockOptions' => $stockOptions
             ]
