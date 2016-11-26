@@ -196,4 +196,9 @@ class Trade
     {
         return $this->stock_option;
     }
+
+    public function __toString()
+    {
+        return $this->getStockOption()->getTickerSymbol();
+    }
 }

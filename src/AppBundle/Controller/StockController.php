@@ -15,6 +15,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 
 class StockController extends Controller
@@ -29,7 +30,7 @@ class StockController extends Controller
         return $this->render(
             'home-broker/stock-list.html.twig',
             [
-                'stockOptions' => $stockOptions
+                'stockOptions' => $stockOptions,
             ]
         );
     }
@@ -48,7 +49,7 @@ class StockController extends Controller
                 EntityType::class,
                 [
                     'class' => 'AppBundle:StockOption',
-                    'label' => 'Empresa'
+                    'label' => 'Empresa',
                 ]
             )
             ->add('quantity', IntegerType::class, ['label' => 'Quantidade'])
@@ -57,32 +58,49 @@ class StockController extends Controller
 
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            // $form->getData() holds the submitted values
-            // but, the original `$task` variable has also been updated
-            $trade = $form->getData();
-            $trade->setUser($this->getUser());
+        if ($form->isSubmitted()) {
+            if (!($trade->getQuantity() <= $trade->getStockOption()->getQuantity())) {
+                $form
+                    ->get('stockOption')
+                    ->addError(new FormError('Esta empresa não possui essa quantidade de ações disponíveis.'));
+            }
 
-            $trade->setPaid($trade->getStockOption()->getValue());
+            $transactionValue = $trade->getStockOption()->getValue() * $trade->getQuantity();
+            if (!($transactionValue <= $this->getUser()->getBalance())) {
+                $form
+                    ->get('quantity')
+                    ->addError(new FormError('Seu saldo é insuficiente para executar esta transação.'));
+            }
+
+            if ($form->isValid()) {
+
+                $trade = $form->getData();
+                $trade->setUser($this->getUser());
+
+                $trade->setPaid($trade->getStockOption()->getValue());
 
 
-            $newBalance = $this->getUser()->getBalance() - $transactionValue;
+                $newBalance = $this->getUser()->getBalance() - $transactionValue;
 
-            $this->getUser()->setBalance($newBalance);
+                $this->getUser()->setBalance($newBalance);
 
-            // ... perform some action, such as saving the task to the database
-            // for example, if Task is a Doctrine entity, save it!
-             $em = $this->getDoctrine()->getManager();
-             $em->persist($trade);
-             $em->flush();
+                $newQuantity = $trade->getStockOption()->getQuantity() - $trade->getQuantity();
+                $trade->getStockOption()->setQuantity($newQuantity);
 
-            return $this->redirectToRoute('user-dashboard');
+                // ... perform some action, such as saving the task to the database
+                // for example, if Task is a Doctrine entity, save it!
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($trade);
+                $em->flush();
+
+                return $this->redirectToRoute('user-dashboard');
+            }
         }
 
         return $this->render(
             'home-broker/buy-stocks.html.twig',
             [
-                'form' => $form->createView()
+                'form' => $form->createView(),
             ]
         );
     }
