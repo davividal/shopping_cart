@@ -17,3 +17,7 @@ AppBundle\Entity\StockOption:
         value:
             type: decimal
             scale: 2
+    oneToMany:
+        trades:
+            targetEntity: Trade
+            mappedBy: stock_option

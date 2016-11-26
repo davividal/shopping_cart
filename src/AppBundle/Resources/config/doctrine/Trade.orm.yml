@@ -17,15 +17,15 @@ AppBundle\Entity\Trade:
             precision: 10
             scale: 2
     manyToOne:
-            user:
-                targetEntity: User
-                inversedBy: trades
-                joinColumn:
-                    name: user_id
-                    referencedColumnName: id
-            stock_option:
-                targetEntity: StockOption
-                inversedBy: trades
-                joinColumn:
-                    name: stock_option_id
-                    referencedColumnName: id
+        user:
+            targetEntity: User
+            inversedBy: trades
+            joinColumn:
+                name: user_id
+                referencedColumnName: id
+        stock_option:
+            targetEntity: StockOption
+            inversedBy: trades
+            joinColumn:
+                name: stock_option_id
+                referencedColumnName: id

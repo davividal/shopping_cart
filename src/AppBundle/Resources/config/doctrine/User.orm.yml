@@ -15,3 +15,11 @@ AppBundle\Entity\User:
         password:
             type: string
             length: 255
+        balance:
+            type: decimal
+            precision: 10
+            scale: 2
+    oneToMany:
+        trades:
+            targetEntity: Trade
+            mappedBy: user
