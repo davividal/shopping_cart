@@ -1,0 +1,99 @@
+diff --git a/src/AppBundle/Controller/ProductController.php b/src/AppBundle/Controller/ProductController.php
+new file mode 100644
+index 0000000..975c275
+--- /dev/null
++++ b/src/AppBundle/Controller/ProductController.php
+@@ -0,0 +1,14 @@
++<?php
++
++namespace AppBundle\Controller;
++
++use Symfony\Bundle\FrameworkBundle\Controller\Controller;
++
++class ProductController extends Controller
++{
++    public function indexAction($name)
++    {
++        $products = $this->getDoctrine()->getRepository('AppBundle:Product')->findAll();
++        return $this->render('', ['name' => $name]);
++    }
++}
+diff --git a/src/AppBundle/Resources/config/doctrine/Product.orm.yml b/src/AppBundle/Resources/config/doctrine/Product.orm.yml
+new file mode 100644
+index 0000000..a21332f
+--- /dev/null
++++ b/src/AppBundle/Resources/config/doctrine/Product.orm.yml
+@@ -0,0 +1,19 @@
++AppBundle\Entity\Product:
++    type: entity
++    table: products
++    id:
++        id:
++            type: integer
++            generator: { strategy: AUTO }
++    fields:
++        name:
++            type: string
++            length: 100
++        price:
++            type: decimal
++            precision: 10
++            scale: 2
++    oneToMany:
++        purchases:
++            targetEntity: ShoppingCart
++            mappedBy: product
+\ No newline at end of file
+diff --git a/src/AppBundle/Resources/config/doctrine/ShoppingCart.orm.yml b/src/AppBundle/Resources/config/doctrine/ShoppingCart.orm.yml
+new file mode 100644
+index 0000000..591ae63
+--- /dev/null
++++ b/src/AppBundle/Resources/config/doctrine/ShoppingCart.orm.yml
+@@ -0,0 +1,27 @@
++AppBundle\Entity\ShoppingCart:
++    type: entity
++    table: shopping_carts
++    id:
++        id:
++            type: integer
++            generator: { strategy: AUTO }
++    fields:
++        user_id:
++            type: integer
++        product_id:
++            type: integer
++        quantity:
++            type: integer
++    manyToOne:
++        user:
++            targetEntity: User
++            inversedBy: items
++            joinColumn:
++                name: user_id
++                referencedColumnName: id
++        product:
++            targetEntity: Product
++            inversedBy: purchases
++            joinColumn:
++                name: product_id
++                referencedColumnName: id
+\ No newline at end of file
+diff --git a/src/AppBundle/Resources/config/doctrine/User.orm.yml b/src/AppBundle/Resources/config/doctrine/User.orm.yml
+index ab8c539..679f175 100644
+--- a/src/AppBundle/Resources/config/doctrine/User.orm.yml
++++ b/src/AppBundle/Resources/config/doctrine/User.orm.yml
+@@ -15,11 +15,7 @@ AppBundle\Entity\User:
+         password:
+             type: string
+             length: 255
+-        balance:
+-            type: decimal
+-            precision: 10
+-            scale: 2
+     oneToMany:
+-        trades:
+-            targetEntity: Trade
++        items:
++            targetEntity: ShoppingCart
+             mappedBy: user
+\ No newline at end of file

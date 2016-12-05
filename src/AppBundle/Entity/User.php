@@ -29,6 +29,18 @@ class User implements UserInterface, \Serializable
      */
     private $password;
 
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     */
+    private $items;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->items = new \Doctrine\Common\Collections\ArrayCollection();
+    }
 
     /**
      * Get id
@@ -111,39 +123,68 @@ class User implements UserInterface, \Serializable
     {
         return $this->password;
     }
-    /**
-     * @var string
-     */
-    private $balance;
-
 
     /**
-     * Set balance
+     * Add item
      *
-     * @param string $balance
+     * @param \AppBundle\Entity\Product $item
      *
      * @return User
      */
-    public function setBalance($balance)
+    public function addItem(\AppBundle\Entity\Product $item)
     {
-        $this->balance = $balance;
+        $this->items[] = $item;
 
         return $this;
     }
 
     /**
-     * Get balance
+     * Remove item
      *
-     * @return string
+     * @param \AppBundle\Entity\Product $item
      */
-    public function getBalance()
+    public function removeItem(\AppBundle\Entity\Product $item)
     {
-        return $this->balance;
+        $this->items->removeElement($item);
     }
 
-    public function encryptPassword($password)
+    /**
+     * Get items
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getItems()
     {
-        $this->setPassword(crypt($password, ''));
+        return $this->items;
+    }
+
+    /**
+     * String representation of object
+     *
+     * @link http://php.net/manual/en/serializable.serialize.php
+     * @return string the string representation of the object or null
+     * @since 5.1.0
+     */
+    public function serialize()
+    {
+        return serialize([$this->id, $this->login, $this->name, $this->password]);
+    }
+
+    /**
+     * Constructs the object
+     *
+     * @link http://php.net/manual/en/serializable.unserialize.php
+     *
+     * @param string $serialized <p>
+     * The string representation of the object.
+     * </p>
+     *
+     * @return void
+     * @since 5.1.0
+     */
+    public function unserialize($serialized)
+    {
+        list($this->id, $this->login, $this->name, $this->password) = unserialize($serialized);
     }
 
     /**
@@ -200,93 +241,8 @@ class User implements UserInterface, \Serializable
         // TODO: Implement eraseCredentials() method.
     }
 
-    /**
-     * String representation of object
-     * @link http://php.net/manual/en/serializable.serialize.php
-     * @return string the string representation of the object or null
-     * @since 5.1.0
-     */
-    public function serialize()
+    public function encryptPassword($string)
     {
-        return serialize(
-            [
-                $this->id,
-                $this->name,
-                $this->login,
-                $this->password,
-                $this->balance
-            ]
-        );
-    }
-
-    /**
-     * Constructs the object
-     * @link http://php.net/manual/en/serializable.unserialize.php
-     * @param string $serialized <p>
-     * The string representation of the object.
-     * </p>
-     * @return void
-     * @since 5.1.0
-     */
-    public function unserialize($serialized)
-    {
-        list (
-            $this->id,
-            $this->name,
-            $this->login,
-            $this->password,
-            $this->balance
-        ) = unserialize($serialized);
-    }
-
-    public function __toString()
-    {
-        return $this->name;
-    }
-    /**
-     * @var \Doctrine\Common\Collections\Collection
-     */
-    private $trades;
-
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->trades = new \Doctrine\Common\Collections\ArrayCollection();
-    }
-
-    /**
-     * Add trade
-     *
-     * @param \AppBundle\Entity\Trade $trade
-     *
-     * @return User
-     */
-    public function addTrade(\AppBundle\Entity\Trade $trade)
-    {
-        $this->trades[] = $trade;
-
-        return $this;
-    }
-
-    /**
-     * Remove trade
-     *
-     * @param \AppBundle\Entity\Trade $trade
-     */
-    public function removeTrade(\AppBundle\Entity\Trade $trade)
-    {
-        $this->trades->removeElement($trade);
-    }
-
-    /**
-     * Get trades
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getTrades()
-    {
-        return $this->trades;
+        $this->password = sha1($string);
     }
 }

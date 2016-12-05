@@ -1,31 +1,26 @@
-AppBundle\Entity\Trade:
+AppBundle\Entity\Product:
     type: entity
-    table: trades
+    table: products
     id:
         id:
             type: integer
             generator: { strategy: AUTO }
     fields:
-        user_id:
-            type: integer
-        stock_option_id:
-            type: integer
+        name:
+            type: string
+            length: 100
         quantity:
             type: integer
-        paid:
+        price:
             type: decimal
             precision: 10
             scale: 2
+        user_id:
+            type: integer
     manyToOne:
         user:
             targetEntity: User
-            inversedBy: trades
+            inversedBy: products
             joinColumn:
                 name: user_id
-                referencedColumnName: id
-        stock_option:
-            targetEntity: StockOption
-            inversedBy: trades
-            joinColumn:
-                name: stock_option_id
                 referencedColumnName: id

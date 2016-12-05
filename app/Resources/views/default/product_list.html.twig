@@ -1,0 +1,37 @@
+{% extends 'default/base-dashboard.html.twig' %}
+
+{% block body %}
+    <h1>Meus produtos</h1>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Produto</th>
+            <th>Quantidade</th>
+            <th>Valor</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        {% for product in products %}
+        <tr>
+            <td>{{ product.getName }}</td>
+            <td>{{ product.getQuantity }}</td>
+            <td>R$ {{ product.getPrice|number_format(2, ",", ".") }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="3">Nenhum produto!</td></tr>
+        {% endfor %}
+        </tbody>
+
+        <tfoot>
+        <tr>
+            <td>&nbsp;</td>
+            <td class="text-right">Total: </td>
+            <td>R$ {{ total|number_format(2, ",", ".") }}</td>
+        </tr>
+        </tfoot>
+    </table>
+
+    <p><a href="{{ path('insert-products') }}">Inserir produtos</a></p>
+{% endblock %}
