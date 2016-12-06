@@ -69,6 +69,11 @@ class ProductController extends Controller
 
             foreach ($products as $product) {
                 $product = explode("\t", $product);
+
+                if (3 !== count($product)) {
+                    continue;
+                }
+
                 $productEntity = new Product();
                 $productEntity->setName($product[0]);
                 $productEntity->setPriceFromString($product[1]);

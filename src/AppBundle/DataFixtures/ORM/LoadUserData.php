@@ -17,6 +17,13 @@ class LoadUserData implements FixtureInterface
 
         $manager->persist($davi);
 
+        $juca = new User();
+        $juca->setName('Juca');
+        $juca->setLogin('juca');
+        $juca->encryptPassword('teste');
+
+        $manager->persist($juca);
+
         $manager->flush();
     }
 }
